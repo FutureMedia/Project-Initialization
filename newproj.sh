@@ -67,6 +67,15 @@ setup_tailwind() {
 export default { plugins: ["@tailwindcss/postcss"] };
 EOF
 
+  cat > tailwind.config.js <<EOF
+/** @type {import('tailwindcss').Config} */
+export default {
+  content: ["./**/*.{html,js}"],
+  theme: { extend: {} },
+  plugins: [],
+}
+EOF
+
   mkdir -p src
   echo '@import "tailwindcss";' > src/style.css
   cat > index.html <<EOF
@@ -84,6 +93,10 @@ EOF
 
 read -rp "Project name: " PROJ
 [[ -z $PROJ ]] && { echo "❌ name required" >&2; exit 1; }
+# Validate project name (alphanumeric, hyphens, underscores)
+[[ ! $PROJ =~ ^[a-zA-Z0-9_-]+$ ]] && { echo "❌ invalid name (use letters, numbers, hyphens, underscores)" >&2; exit 1; }
+# Check if directory exists
+[[ -d "$PROJ" ]] && { echo "❌ directory '$PROJ' already exists" >&2; exit 1; }
 need git
 
 mkdir "$PROJ" && cd "$PROJ"
